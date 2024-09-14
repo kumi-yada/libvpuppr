@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-  schedule:
-    # Every Monday at 0001
-    - cron: "1 0 * * 1"
+  # schedule:
+  #   # Every Monday at 0001
+  #   - cron: "1 0 * * 1"
   workflow_dispatch:
 
 jobs:
