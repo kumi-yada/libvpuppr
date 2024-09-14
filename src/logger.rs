@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use godot::{engine::ProjectSettings, prelude::*};
+use godot::{classes::ProjectSettings, prelude::*};
 use log::LevelFilter;
 use once_cell::sync::Lazy;
 
@@ -32,7 +32,7 @@ fn add_to_log_store(message: String) {
 fn flush_logs() {
     let project_settings = ProjectSettings::singleton();
 
-    let path = project_settings.globalize_path(GodotString::from("user://vpuppr.log"));
+    let path = project_settings.globalize_path(GString::from("user://vpuppr.log"));
 
     let mut opts = std::fs::OpenOptions::new();
     opts.truncate(false).write(true).create(true);
@@ -85,7 +85,7 @@ pub struct Logger {
 }
 
 #[godot_api]
-impl RefCountedVirtual for Logger {
+impl IRefCounted for Logger {
     fn init(_base: godot::obj::Base<Self::Base>) -> Self {
         Self::new("DefaultLogger".to_string())
     }
@@ -96,13 +96,13 @@ impl Logger {
     /// Create a new `Logger` in Godot with the given name. Loggers may have
     /// duplicate names but this is **_strongly_** discouraged.
     #[func]
-    pub fn create(name: GodotString) -> Gd<Logger> {
-        Gd::new(Self::new(name.into()))
+    pub fn create(name: GString) -> Gd<Logger> {
+        Gd::from_object(Self::new(name.into()))
     }
 
     /// Sets the name of the logger.
     #[func]
-    pub fn set_name(&mut self, name: GodotString) {
+    pub fn set_name(&mut self, name: GString) {
         self.name = name.into();
     }
 
@@ -133,7 +133,7 @@ impl Logger {
 
     /// Send a log using an anonymous logger. Logs are printed to stdout.
     #[func(rename = global)]
-    pub fn global_bound(source: GodotString, message: Variant) {
+    pub fn global_bound(source: GString, message: Variant) {
         Logger::global(
             LevelFilter::Info,
             source.to_string(),
